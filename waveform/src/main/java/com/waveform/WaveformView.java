@@ -106,29 +106,34 @@ public class WaveformView extends View implements Animatable {
     }
 
     private void initFromSpline() {
-        int stepX = getWidth() / VERTICES_COUNT;
+        int width = getWidth();
+        int height = getHeight();
+        int stepX = width / VERTICES_COUNT;
         for (int i = 0; i < VERTICES_COUNT; i++) {
-            fromVerticesX[i] = i != VERTICES_COUNT - 1 ? i * stepX : getWidth();
-            fromVerticesY[i] = getHeight();
+            fromVerticesX[i] = i != VERTICES_COUNT - 1 ? i * stepX : width;
+            fromVerticesY[i] = height;
         }
         spline.build(fromVerticesX, fromVerticesY);
     }
 
     private void initToVertices() {
-        int stepX = getWidth() / VERTICES_COUNT;
+        int width = getWidth();
+        int height = getHeight();
+        int stepX = width / VERTICES_COUNT;
         for (int i = 0; i < VERTICES_COUNT; i++) {
-            toVerticesX[i] = i != VERTICES_COUNT - 1 ? i * stepX : getWidth();
-            toVerticesY[i] = rand.nextInt((int) (0.7 * getHeight() + 1)) + 0.3 * getHeight();
+            toVerticesX[i] = i != VERTICES_COUNT - 1 ? i * stepX : width;
+            toVerticesY[i] = rand.nextInt((int) (0.7 * height + 1)) + 0.3 * height;
         }
     }
 
     private void calculateFromSpline() {
+        int height = getHeight();
         for (int i = 0; i < VERTICES_COUNT; i++) {
             double fromVertexY = fromVerticesY[i];
             double toVertexY = toVerticesY[i];
             double dy = fromVertexY - toVertexY;
             if (Math.abs(dy) <= 2 * VARIANCE_THRESHOLD) {
-                toVerticesY[i] = rand.nextInt((int) (0.7 * getHeight() + 1)) + 0.3 * getHeight();
+                toVerticesY[i] = rand.nextInt((int) (0.7 * height + 1)) + 0.3 * height;
                 continue;
             }
             double newFromVertexY = fromVertexY + (dy > 0 ? -1 : 1) * VARIANCE_THRESHOLD;
@@ -139,19 +144,21 @@ public class WaveformView extends View implements Animatable {
     }
 
     private void drawWave(Canvas canvas) {
+        int width = getWidth();
+        int height = getHeight();
         wavePath.reset();
-        double stepX = getWidth() / CURVE_POINTS_NUMBER;
+        double stepX = width / CURVE_POINTS_NUMBER;
         int x, y;
-        wavePath.moveTo(getWidth(), (int) spline.interpolate(getWidth()));
-        wavePath.lineTo(getWidth(), getHeight());
-        wavePath.lineTo(0, getHeight());
+        wavePath.moveTo(width, (int) spline.interpolate(width));
+        wavePath.lineTo(width, height);
+        wavePath.lineTo(0, height);
         wavePath.lineTo(0, (int) spline.interpolate(0));
         for (int i = 0; i < CURVE_POINTS_NUMBER; i++) {
             x = i * (int) stepX;
             y = (int) spline.interpolate(x);
             wavePath.lineTo(x, y);
         }
-        wavePath.lineTo(getWidth(), (int) spline.interpolate(getWidth()));
+        wavePath.lineTo(width, (int) spline.interpolate(width));
         canvas.drawPath(wavePath, wavePaint);
     }
 }
